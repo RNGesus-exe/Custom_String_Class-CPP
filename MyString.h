@@ -12,7 +12,11 @@ public:
 	~String();
 	const char* get();
 	String(const char*);
+	String(const String&);
 	int len();
+	void toUpper();
+	void toLower();
+	void caseChange();
 	void set(const char*);
 	bool equal(const char*);
 	void reverse();
@@ -34,5 +38,10 @@ public:
 	void replace(const char& , const char& );
 	void replace(const char* , const char* );
 	char** tokenizer();
+	void duplicates();   //hastable
+	void duplicates_bitwise();
+	bool anagrams(const String&);
+	friend void permutation(char* ,const int&,const int&); //NEEDS TO BE FIXED IN NEXT PATCH
+	bool palindrome();
 	void print();
 };

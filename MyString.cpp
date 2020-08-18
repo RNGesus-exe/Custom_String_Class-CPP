@@ -17,14 +17,19 @@ String::String()			//default constructor
 }
 String::~String()			//destructor
 {
-	delete[] str;
-	str = nullptr;
-	for (int i = 0; i < listSize; i++)
-	{
-		delete[] list[i];
+	this->print();
+	if (str != nullptr) {
+		delete[] str;
+		str = nullptr;
 	}
-	delete[] list;
-	list = nullptr;			//will be fixed in V3.0
+	if (list != nullptr) {
+		for (int i = 0; i < listSize; i++)
+		{
+			delete[] list[i];
+		}
+		delete[] list;
+		list = nullptr;			//will be fixed in V3.0
+	}
 }
 const char* String::get()	//getter/accessor
 {
@@ -40,9 +45,57 @@ String::String(const char* s)   //overloaded contructor
 	}
 	str[length] = '\0';
 }
+String::String(const String& s){    ///copy constructor
+	if (s.str != nullptr) {
+		this->length = s.length;
+		this->str = new char[this->length + 1];
+		for (int i = 0; i < length; i++) {
+			this->str[i] = s.str[i];
+		}
+		str[length] = '\0';
+	}
+	if (s.list != nullptr) {
+		this->listSize = s.listSize;
+		this->list = new char* [listSize];
+		for (int i = 0; i < s.listSize; i++) {
+			list[i] = new char[Plen(s.list[i] + 1)];
+			for (int j = 0; j<Plen(s.list[i]); j++) {
+				this->list[i][j] = s.list[i][j];
+			}
+		}
+	}
+}
 int String::len()				//function to get length of a string
 {
 	return length;
+}
+void String::toUpper()
+{
+	for (int i = 0; i < length; i++) {
+		if (str[i] >= 'a' && str[i] <= 'z') {
+			str[i] -= 32;
+		}
+	}
+}
+void String::toLower()
+{
+	for (int i = 0; i < length; i++) {
+		if (str[i] >= 'A' && str[i] <= 'Z') {
+			str[i] += 32;
+		}
+	}
+}
+void String::caseChange()
+{
+	for (int i = 0; i < length; i++) {
+		if (str[i] >= 'A' && str[i] <= 'Z') {
+			str[i] += 32;
+		}
+		else if (str[i] >= 'a' && str[i] <= 'z') {
+			str[i] -= 32;
+		}
+
+	}
 }
 void String::set(const char* s)		//mutator/setter
 {
@@ -313,6 +366,7 @@ int String::count(const char* s)
 				if (str[j] != s[k])
 				{
 					flag = false;
+					break;
 				}
 			}
 			if (flag)
@@ -403,7 +457,93 @@ char** String::tokenizer()
 	}
 	return list;
 }
+void String::duplicates()
+{
+	String temp(str);
+	temp.toLower();
+	int* hashTable = new int[25];
+	for (int i = 0; i < temp.length; i++) {
+		if (hashTable[temp.str[i] - 'a'] != 1) {
+			hashTable[temp.str[i] - 'a'] = 1;
+		}
+		else {
+			hashTable[temp.str[i] - 'a'] += 1;
+		}
+	}
+	for (int i = 0; i < 25; i++) {
+		if (hashTable[i] > 1) {
+			cout << hashTable[i] << " " << (char)(i+'a') << endl;
+		}
+	}
+	delete[] hashTable;
+	hashTable = nullptr;
+}
+void String::duplicates_bitwise(){
+	String temp(str);
+	temp.toLower();
+	long int h = 0, x = 0;
+	for (int i = 0; i < temp.length; i++) {
+		x = 1;
+		x = x << temp.str[i] - 'a';
+		if ((x & h) > 0) {
+			cout << temp.str[i] << " is a duplicate\n";
+		}
+		else {
+			h = x | h;
+		}
+	}
+}
+bool String::anagrams(const String& s)
+{
+	if (s.length == this->length) {
+		String temp(str), temp2(s.str);
+		temp.toLower();
+		temp2.toLower();
+		temp2.toLower();
+		int hashTable[25] = {};
+		for (int i = 0; i < temp.length; i++) {
+			hashTable[temp.str[i] - 'a'] += 1;
+		}
+		for (int i = 0; i < temp2.length; i++) {
+			hashTable[temp2.str[i] - 'a'] -= 1;
+		}
+		for (int i = 0; i < temp.length; i++) {
+			if (hashTable[temp.str[i] - 'a']) {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+bool String::palindrome()
+{
+	String temp;
+	temp.set(str);
+	temp.toLower();
+	for (int i = 0; i < length / 2; i++) {
+		if (temp.str[i] != temp.str[(length-1) - i]) {
+			return false;
+		}
+	}
+		return true;
+}
 void String::print()
 {
 	cout << str << endl;
+}
+
+void permutation(char* str, const int& low, const int& high)
+{
+	int i;
+	if (low == high) {
+		std::cout << str << "\n";
+	}
+	else {
+		for (i = low; i <= high; i++) {
+			swap(str[low], str[i]);
+			permutation(str,low + 1, high);
+			swap(str[low], str[i]);
+		}
+	}
 }
